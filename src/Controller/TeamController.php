@@ -25,21 +25,25 @@ final class TeamController extends AbstractController
 
     #[Route('/add', name: 'team_add', methods: ['GET', 'POST'])]
     #[Route('/{id}', name: 'team_edit', requirements:  ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function edit(Request $request, EntityManagerInterface $manager, ?Employee $employee): Response
+    public function edit(Request $request, EntityManagerInterface $manager, ?Employee $employee = null): Response
     {
+        if (!$employee)
+            $employee = new Employee();
+
         $form = $this->createForm(EmployeeType::class, $employee);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $manager->persist($employee);
-            $employee->setThumbnail('Bonjour');
+            $employee->setThumbnail(substr($employee->getFirstname(), 0, 1) . substr($employee->getLastname(), 0, 1));
             $manager->flush();
+            return $this->redirectToRoute('team_index');
         }
         return $this->render('team/edit.html.twig', [
             'form' => $form,
         ]);
     }
     #[Route('/{id}', name: 'team_delete', methods: ['DELETE'])]
-    #[Route('/delete/{id}', name: 'team_delete', methods: ['GET'])]
+    #[Route('/delete/{id}', name: 'team_delete', requirements:  ['id' => '\d+'], methods: ['GET'])]
     public function delete(Request $request, EntityManagerInterface $manager, Employee $employee): Response
     {
         /* Utiliser la requète pour ajouter le verbe delete */
