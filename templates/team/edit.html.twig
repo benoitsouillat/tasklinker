@@ -2,7 +2,13 @@
 
 {% block body %}
     {{ form_start(form) }}
-    {{ form_widget(form) }}
+
+    {{ form_row(form.firstname) }}
+    {{ form_row(form.lastname) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.hireDate) }}
+    {{ form_row(form.status) }}
     <button type="submit">Enregistrer</button>
+
     {{ form_end(form) }}
 {% endblock %}

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TeamController!{% endblock %}
+{% block title %}Liste des employées{% endblock %}
 
 {% block body %}
     <table id="team-container">
@@ -27,10 +27,10 @@
                 </td>
                 <td>{{ employee.status.getLabel() }}</td>
                 <td>
-                    <a class="button button-edit-team" href="{{ path('team_edit', {'id': employee.id}) }}">
+                    <a class="button button-edit-team" href="{{ path('app_team_edit', {'id': employee.id}) }}">
                         Éditer
                     </a>
-                    <a class="delete-team" href="{{ path('team_delete', {'id': employee.id}) }}">
+                    <a class="delete-team" href="{{ path('app_team_delete', {'id': employee.id}) }}">
                         Supprimer
                     </a>
                 </td>

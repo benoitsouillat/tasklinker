@@ -6,6 +6,7 @@ use App\Entity\Employee;
 use App\Enum\JobStatus;
 use Composer\XdebugHandler\Status;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -25,6 +26,9 @@ class EmployeeType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Email',
+            ])
+            ->add('hireDate', DateType::class, [
+                'label' => 'Date d\'entrée',
             ])
             ->add('status', EnumType::class, [
                 'class' => JobStatus::class,

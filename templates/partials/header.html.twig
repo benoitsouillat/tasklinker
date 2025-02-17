@@ -1,11 +1,15 @@
 <div id="current-user"></div>
 <div id="title-page">
     <div class="flex-header">
-        <h1>Nom du projet</h1>
+        <h1>{{ title }}</h1>
+        {% if projectTeam is defined %}
         <div class="user-list">
             <div class="avatar">ND</div>
             <div class="avatar">DB</div>
         </div>
-        <a class="button" href="projet-edit.html">Modifier</a>
+        {% endif %}
+        {% if project is defined %}
+            <a class="button" href="projet-edit.html">Modifier</a>
+        {% endif %}
     </div>
 </div>

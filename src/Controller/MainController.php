@@ -11,6 +11,6 @@ final class MainController extends AbstractController
     #[Route('', name: 'index')]
     public function index(): Response
     {
-        return $this->redirectToRoute('project_index');
+        return $this->redirectToRoute('app_project_index');
     }
 }
