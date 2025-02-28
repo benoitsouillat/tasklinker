@@ -13,6 +13,10 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/team', name: 'app_team_')]
 final class TeamController extends AbstractController
 {
+    public function __construct(private readonly EntityManagerInterface $manager)
+    {
+    }
+
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(EmployeeRepository $repository): Response
     {
@@ -26,7 +30,7 @@ final class TeamController extends AbstractController
 
     #[Route('/add', name: 'add', methods: ['GET', 'POST'])]
     #[Route('/{id}', name: 'edit', requirements:  ['id' => '\d+'], methods: ['GET', 'POST'])]
-    public function edit(Request $request, EntityManagerInterface $manager, ?Employee $employee = null): Response
+    public function edit(Request $request,?Employee $employee = null): Response
     {
         if (!$employee)
             $employee = new Employee();
@@ -34,10 +38,10 @@ final class TeamController extends AbstractController
         $form = $this->createForm(EmployeeType::class, $employee);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $manager->persist($employee);
+            $this->manager->persist($employee);
             $employee->setThumbnail(substr($employee->getFirstname(), 0, 1) . substr($employee->getLastname(), 0, 1));
-            $manager->flush();
-            return $this->redirectToRoute('team_index');
+            $this->manager->flush();
+            return $this->redirectToRoute('app_team_index');
         }
         return $this->render('team/edit.html.twig', [
             'title' => !empty($employee) ? $employee->getFirstname() . ' ' . $employee->getLastname() : 'Ajouter un employé',
@@ -47,11 +51,10 @@ final class TeamController extends AbstractController
     }
     #[Route('/{id}', name: 'delete', methods: ['DELETE'])]
     #[Route('/delete/{id}', name: 'delete', requirements:  ['id' => '\d+'], methods: ['GET'])]
-    public function delete(Request $request, EntityManagerInterface $manager, Employee $employee): Response
+    public function delete(Request $request, Employee $employee): Response
     {
-        /* Utiliser la requète pour ajouter le verbe delete */
-        $manager->remove($employee);
-        $manager->flush();
-        return $this->redirectToRoute('team_index');
+        $this->manager->remove($employee);
+        $this->manager->flush();
+        return $this->redirectToRoute('app_team_index');
     }
 }

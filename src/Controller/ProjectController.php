@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Project;
+use App\Entity\Task;
 use App\Form\ProjectType;
+use App\Form\TaskType;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,8 +30,20 @@ final class ProjectController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}', name: 'show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(Project $project): Response
+    {
+        return $this->render('project/show.html.twig', [
+            'title' => $project->getName(),
+            'project' => $project,
+            'todo' => $this->manager->getRepository(Task::class)->findAllByStatus('to do', $project->getId()),
+            'doing' => $this->manager->getRepository(Task::class)->findAllByStatus('doing', $project->getId()),
+            'done' => $this->manager->getRepository(Task::class)->findAllByStatus('done', $project->getId()),
+        ]);
+    }
+
     #[Route('/add', name: 'add', methods: ['GET', 'POST'])]
-    #[Route('/{id}', name: 'edit', requirements: ['id' => '\+d'], methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function edit(Request $request, ?Project $project = null): Response
     {
         if ($project === null) {
@@ -58,5 +72,25 @@ final class ProjectController extends AbstractController
         $this->manager->flush();
 
         return $this->redirectToRoute('app_project_index');
+    }
+
+    #[Route('/{id}/add-task', name: 'add-task', methods: ['GET', 'POST'])]
+    public function addTask(Request $request, Project $project): Response
+    {
+        $task = new Task();
+        $form = $this->createForm(TaskType::class, $task, [
+            'teamList' =>  $project->getTeamList(),
+        ]);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $task->setProject($project);
+            $this->manager->persist($task);
+            $this->manager->flush();
+            return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
+        }
+        return $this->render('task/edit.html.twig', [
+            'title' => !empty($task->getTitle()) ? $task->getTitle() : 'Créer une tâche',
+            'form' => $form->createView(),
+        ]);
     }
 }

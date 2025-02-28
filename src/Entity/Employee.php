@@ -6,6 +6,7 @@ use App\Enum\JobStatus;
 use App\Repository\EmployeeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -20,12 +21,28 @@ class Employee
     #[ORM\Column(length: 255)]
     private ?string $thumbnail = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 3,
+        max: 50,
+        minMessage: "Le nom doit contenir au minimum 3 caractères",
+        maxMessage: "Le nom ne peut excéder 50 caractères"
+    )]
     #[ORM\Column(length: 255)]
     private ?string $firstname = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 3,
+        max: 50,
+        minMessage: "Le prénom doit contenir au minimum 3 caractères",
+        maxMessage: "Le prénom ne peut excéder 50 caractères"
+    )]
     #[ORM\Column(length: 255)]
     private ?string $lastname = null;
 
+    #[Assert\NotBlank]
+    #[Assert\Email(message: "Veuillez entrer un email valide")]
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
@@ -41,9 +58,14 @@ class Employee
     #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'teamList')]
     private Collection $projects;
 
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'employee', cascade: ['persist', 'remove'])]
+    private Collection $tasks;
+
     public function __construct()
     {
         $this->projects = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -149,4 +171,29 @@ class Employee
 
         return $this;
     }
+
+    public function getTasks(): ?Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setEmployee($this);
+        }
+        return $this;
+    }
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            // Set the owning side to null (unless already changed)
+            if ($task->getEmployee() === $this) {
+                $task->setEmployee(null);
+            }
+        }
+        return $this;
+    }
+
 }

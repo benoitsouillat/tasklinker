@@ -5,8 +5,11 @@ namespace App\Entity;
 use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+#[UniqueEntity('name', message: "Ce nom de projet est déjà utilisé")]
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
 class Project
 {
@@ -15,6 +18,13 @@ class Project
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: "Le nom du projet est obligatoire")]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: "Le nom du projet doit contenir au minimum 3 caractères",
+        maxMessage: "Le nom du projet ne peut excéder 255 caractères"
+    )]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
@@ -24,9 +34,14 @@ class Project
     #[ORM\ManyToMany(targetEntity: Employee::class, inversedBy: 'projects')]
     private Collection $teamList;
 
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
+    private Collection $tasks;
+
     public function __construct()
     {
         $this->teamList = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -69,4 +84,28 @@ class Project
 
         return $this;
     }
+    public function getTasks(): ?Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(Task $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setProject($this);
+        }
+        return $this;
+    }
+    public function removeTask(Task $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            // Set the owning side to null (unless already changed)
+            if ($task->getProject() === $this) {
+                $task->setProject(null);
+            }
+        }
+        return $this;
+    }
+
 }
