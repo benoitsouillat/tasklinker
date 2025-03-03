@@ -4,8 +4,7 @@ namespace App\Entity;
 
 use App\Enum\TaskStatus;
 use App\Repository\TaskRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -17,6 +16,13 @@ class Task
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message: "Le nom de la tâche est obligatoire")]
+    #[Assert\Length(
+        min: 5,
+        max: 255,
+        minMessage: "Le nom de la tâche doit contenir au minimum 5 caractères",
+        maxMessage: "Le nom de la tâche ne peut excéder 255 caractères"
+    )]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 

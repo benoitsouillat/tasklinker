@@ -9,14 +9,4 @@ enum JobStatus: string
     case freelance = "Freelance";
     case interim = "Interim";
 
-    public function getLabel(): string
-    {
-        return match ($this) {
-            self::cdi => "CDI",
-            self::cdd => "CDD",
-            self::freelance => "Freelance",
-            self::interim => "Interim",
-        };
-    }
-
 }

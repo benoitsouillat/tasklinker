@@ -32,15 +32,16 @@ final class TeamController extends AbstractController
     #[Route('/{id}', name: 'edit', requirements:  ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function edit(Request $request,?Employee $employee = null): Response
     {
-        if (!$employee)
+        if (!$employee) {
             $employee = new Employee();
+        }
 
-        $form = $this->createForm(EmployeeType::class, $employee);
-        $form->handleRequest($request);
+        $form = $this->createForm(EmployeeType::class, $employee)
+                ->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->manager->persist($employee);
-            $employee->setThumbnail(substr($employee->getFirstname(), 0, 1) . substr($employee->getLastname(), 0, 1));
             $this->manager->flush();
+            $this->addFlash('success', sprintf("L'employé %s a bien été édité", $employee->getFirstname() . ' ' . $employee->getLastname()));
             return $this->redirectToRoute('app_team_index');
         }
         return $this->render('team/edit.html.twig', [
@@ -55,6 +56,7 @@ final class TeamController extends AbstractController
     {
         $this->manager->remove($employee);
         $this->manager->flush();
+        $this->addFlash('success', sprintf("L'employé %s a bien été supprimé", $employee->getFirstname() . ' ' . $employee->getLastname()));
         return $this->redirectToRoute('app_team_index');
     }
 }

@@ -24,6 +24,13 @@
                 <header>
                     {% include 'partials/header.html.twig' %}
                 </header>
+                {% for label, messages in app.flashes(['success', 'warning', 'danger']) %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
                 <div id="content">
                     {% block body %}{% endblock %}
                 </div>

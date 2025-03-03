@@ -70,7 +70,7 @@ final class ProjectController extends AbstractController
     {
         $this->manager->remove($project);
         $this->manager->flush();
-
+        $this->addFlash('success', sprintf("Le projet %s a bien été supprimé avec toutes ses tâches", htmlspecialchars($project->getName())));
         return $this->redirectToRoute('app_project_index');
     }
 
@@ -86,6 +86,7 @@ final class ProjectController extends AbstractController
             $task->setProject($project);
             $this->manager->persist($task);
             $this->manager->flush();
+            $this->addFlash('success', sprintf("La tâche %s a bien été ajoutée", $task->getTitle()));
             return $this->redirectToRoute('app_project_show', ['id' => $project->getId()]);
         }
         return $this->render('task/edit.html.twig', [

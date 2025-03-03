@@ -27,6 +27,7 @@ final class TaskController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->manager->persist($task);
             $this->manager->flush();
+            $this->addFlash('warning', sprintf("La tâche %s a bien été mise à jour", $task->getTitle()));
 
             return $this->redirectToRoute('app_project_show', ['id' => $task->getProject()->getId()]);
         }
@@ -43,6 +44,7 @@ final class TaskController extends AbstractController
     {
         $this->manager->remove($task);
         $this->manager->flush();
+        $this->addFlash('danger', sprintf("La tâche %s a bien été supprimée", $task->getTitle()));
         return $this->redirectToRoute('app_project_index');
     }
 }

@@ -18,7 +18,7 @@ class Employee
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $thumbnail = null;
 
     #[Assert\NotBlank]
@@ -78,10 +78,9 @@ class Employee
         return $this->thumbnail;
     }
 
-    public function setThumbnail(string $thumbnail): static
+    public function setThumbnail(?string $thumbnail): static
     {
         $this->thumbnail = $thumbnail;
-
         return $this;
     }
 
@@ -195,5 +194,8 @@ class Employee
         }
         return $this;
     }
-
+    public function getInitial()
+    {
+        return substr($this->getFirstname(), 0, 1) . substr($this->getLastname(), 0, 1);
+    }
 }
