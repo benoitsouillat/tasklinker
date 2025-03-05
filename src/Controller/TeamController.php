@@ -41,7 +41,7 @@ final class TeamController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->manager->persist($employee);
             $this->manager->flush();
-            $this->addFlash('success', sprintf("L'employé %s a bien été édité", $employee->getFirstname() . ' ' . $employee->getLastname()));
+            $this->addFlash('success', sprintf("L'employé %s a bien été mis à jour", $employee->getFirstname() . ' ' . $employee->getLastname()));
             return $this->redirectToRoute('app_team_index');
         }
         return $this->render('team/edit.html.twig', [
