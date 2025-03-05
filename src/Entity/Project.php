@@ -37,6 +37,9 @@ class Project
     #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
     private Collection $tasks;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $archive = false;
+
     public function __construct()
     {
         $this->teamList = new ArrayCollection();
@@ -105,6 +108,18 @@ class Project
                 $task->setProject(null);
             }
         }
+        return $this;
+    }
+
+    public function isArchive(): ?bool
+    {
+        return $this->archive;
+    }
+
+    public function setArchive(bool $archive): static
+    {
+        $this->archive = $archive;
+
         return $this;
     }
 

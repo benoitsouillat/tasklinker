@@ -23,7 +23,7 @@ final class ProjectController extends AbstractController
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
-        $projects = $this->manager->getRepository(Project::class)->findAll();
+        $projects = $this->manager->getRepository(Project::class)->findAllActive();
         return $this->render('project/index.html.twig', [
             'title' => 'Projets',
             'projects' => $projects,
@@ -64,13 +64,13 @@ final class ProjectController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['DELETE'])]
     #[Route('/delete/{id}', name: 'delete', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function delete(Request $request, Project $project): Response
+    public function delete(Project $project): Response
     {
-        $this->manager->remove($project);
+        $project->setArchive(true);
+        $this->manager->persist($project);
         $this->manager->flush();
-        $this->addFlash('success', sprintf("Le projet %s a bien été supprimé avec toutes ses tâches", htmlspecialchars($project->getName())));
+        $this->addFlash('success', sprintf("Le projet %s a bien été archivé avec toutes ses tâches", htmlspecialchars($project->getName())));
         return $this->redirectToRoute('app_project_index');
     }
 
